@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
-
+import axios from "axios"
+import toast from 'react-hot-toast';
 
 export default function RegisterForm() {
     const [formData, setFormData] = useState({
@@ -24,12 +25,31 @@ export default function RegisterForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
         if (formData.password !== formData.confirmPassword) {
-            alert("Passwords do not match")
+            toast.error("Passwords do not match")
             return
         }
-
         setIsLoading(true)
+        try {
+            const response = await axios.post("/api/auth/register", {
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+                role: formData.role,
+            });
+            if (response.status === 201) {
+                toast.success("Registration successful! You can now log in.");
+            }
+        } catch (error: any) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage =
+                    error.response?.data?.error || "Something went wrong";
+
+                toast.error(errorMessage);
+            }
+        }
 
         setIsLoading(false)
     }
