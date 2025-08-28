@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String
+  phone         String?
+  role          Role      @default(user)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  vehicles      Vehicle[]
+  bookings      Booking[]
+  parkingSpots  ParkingSpot[]
+  reviews       Review[]
+  payments      Payment[]
+
+  @@map("users")
+}
+
+model Vehicle {
+  id        String   @id @default(cuid())
+  make      String
+  model     String
+  year      Int
+  color     String
+  license   String   @unique
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  bookings  Booking[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("vehicles")
+}
+
+model ParkingSpot {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  address     String
+  city        String
+  state       String
+  zipCode     String    @map("zip_code")
+  lat         Float
+  lng         Float
+  price       Float
+  isAvailable Boolean   @default(true) @map("is_available")
+  features    String[]
+  images      String[]
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  bookings    Booking[]
+  reviews     Review[]
+  availabilities Availability[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("parking_spots")
+}
+
+model Booking {
+  id            String     @id @default(cuid())
+  startTime     DateTime   @map("start_time")
+  endTime       DateTime   @map("end_time")
+  totalPrice    Float      @map("total_price")
+  status        String     @default("PENDING")
+  userId        String     @map("user_id")
+  user          User       @relation(fields: [userId], references: [id])
+  vehicleId     String     @map("vehicle_id")
+  vehicle       Vehicle    @relation(fields: [vehicleId], references: [id])
+  parkingSpotId String     @map("parking_spot_id")
+  parkingSpot   ParkingSpot @relation(fields: [parkingSpotId], references: [id])
+  payment       Payment?
+  review        Review?
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  @@map("bookings")
+}
+
+model Review {
+  id            String     @id @default(cuid())
+  rating        Int
+  comment       String?
+  userId        String     @map("user_id")
+  user          User       @relation(fields: [userId], references: [id])
+  parkingSpotId String     @map("parking_spot_id")
+  parkingSpot   ParkingSpot @relation(fields: [parkingSpotId], references: [id])
+  bookingId     String     @unique @map("booking_id")
+  booking       Booking    @relation(fields: [bookingId], references: [id])
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  @@map("reviews")
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  amount        Float
+  status        String
+  paymentMethod String   @map("payment_method")
+  transactionId String   @unique @map("transaction_id")
+  userId        String   @map("user_id")
+  user          User     @relation(fields: [userId], references: [id])
+  bookingId     String   @unique @map("booking_id")
+  booking       Booking  @relation(fields: [bookingId], references: [id])
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("payments")
+}
+
+model Availability {
+  id            String     @id @default(cuid())
+  date          DateTime
+  isAvailable   Boolean    @default(true) @map("is_available")
+  parkingSpotId String     @map("parking_spot_id")
+  parkingSpot   ParkingSpot @relation(fields: [parkingSpotId], references: [id])
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  @@unique([parkingSpotId, date])
+  @@map("availabilities")
+}
+
+enum Role {
+ user
+ owner
+}
