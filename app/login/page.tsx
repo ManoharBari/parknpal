@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
+import axios from "axios"
+import toast from "react-hot-toast"
 
 export default function LoginForm() {
     const [email, setEmail] = useState("")
@@ -17,8 +19,22 @@ export default function LoginForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
-        //API Call
+        try {
+            const response = await axios.post("/api/auth/login", {
+                email: email,
+                password: password,
+            });
+            if (response.status === 201) {
+                toast.success(`Welcome back, ${response.data.data.user.name}!`);
+            }
+        } catch (error: any) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage =
+                    error.response?.data?.error || "Something went wrong";
 
+                toast.error(errorMessage);
+            }
+        }
         setIsLoading(false)
     }
 

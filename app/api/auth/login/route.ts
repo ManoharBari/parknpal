@@ -48,10 +48,13 @@ export async function POST(request: NextRequest) {
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
 
-    return successResponse({
-      user: userWithoutPassword,
-      token,
-    });
+    return successResponse(
+      {
+        user: userWithoutPassword,
+        token,
+      },
+      201
+    );  
   } catch (error) {
     if (error instanceof z.ZodError) {
       return errorResponse(error.errors.map((e) => e.message).join(", "), 400);
