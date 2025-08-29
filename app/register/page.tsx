@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import Link from "next/link"
 import axios from "axios"
 import toast from 'react-hot-toast';
+import { useRouter } from "next/navigation"
 
 export default function RegisterForm() {
     const [formData, setFormData] = useState({
@@ -22,7 +23,7 @@ export default function RegisterForm() {
         role: "user" as "user" | "owner",
     })
     const [isLoading, setIsLoading] = useState(false)
-
+    const router = useRouter();
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
@@ -42,6 +43,8 @@ export default function RegisterForm() {
             if (response.status === 201) {
                 toast.success("Registration successful! You can now log in.");
             }
+            sessionStorage.setItem("token", response.data.data.token);
+            router.push("/dashboard");
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
                 const errorMessage =

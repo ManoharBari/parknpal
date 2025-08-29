@@ -9,6 +9,7 @@ import PaymentForm from "@/components/payment/payment-form"
 import BookingConfirmation from "@/components/booking/booking-confirmation"
 import BottomNav from "@/components/navigation/bottom-nav"
 import DesktopSidebar from "@/components/navigation/desktop-sidebar"
+import axios from "axios"
 
 type AppScreen = "map" | "spot-detail" | "booking-form" | "payment-form" | "booking-confirmation"
 
@@ -56,15 +57,30 @@ export default function DashboardPage() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>("map")
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null)
   const [bookingData, setBookingData] = useState<any>(null)
+  const [user, setuser] = useState("")
 
-  // useEffect(() => {
-  //   const isAuthenticated = localStorage.getItem("isAuthenticated")
-  //   const userRole = localStorage.getItem("userRole")
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = sessionStorage.getItem("token");
 
-  //   if (!isAuthenticated || userRole !== "user") {
-  //     router.push("/")
-  //   }
-  // }, [router])
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+      try {
+        const { data } = await axios.get("/api/getuser", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setuser(data.data.user);
+      } catch (error: any) {
+        console.log(error.response?.data || error.message);
+      }
+
+    };
+    fetchUser();
+  }, [router])
 
   const handleSpotSelect = (spotId: string) => {
     setSelectedSpotId(spotId)
@@ -115,7 +131,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
-      <DesktopSidebar activeTab="home" onTabChange={() => {}} userRole="user" />
+      <DesktopSidebar user={user} activeTab="home" onTabChange={() => { }} userRole="user" />
 
       {/* Main Content */}
       <div className="flex-1 lg:ml-64">
@@ -140,7 +156,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Mobile Bottom Navigation */}
-        <BottomNav activeTab="home" onTabChange={() => {}} userRole="user" />
+        <BottomNav activeTab="home" onTabChange={() => { }} userRole="user" />
       </div>
     </div>
   )

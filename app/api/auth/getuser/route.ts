@@ -1,15 +1,10 @@
+import { getUserFromAuth } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { errorResponse, successResponse } from "@/lib/response";
 import { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-import { prisma } from "@/lib/db";
 
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string | null;
-  role: "user" | "owner";
-}
-
-export async function getUserFromAuth(request: NextRequest): Promise<AuthUser> {
+export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -33,20 +28,8 @@ export async function getUserFromAuth(request: NextRequest): Promise<AuthUser> {
       throw new Error("User not found");
     }
 
-    return user;
+    return successResponse(user, 200);
   } catch (error) {
-    throw new Error("Invalid or expired token");
+    return errorResponse("Unauthorized", 401);
   }
-}
-
-export async function requireOwnerRole(
-  request: NextRequest
-): Promise<AuthUser> {
-  const user = await getUserFromAuth(request);
-
-  if (user.role !== "owner") {
-    throw new Error("Owner role required");
-  }
-
-  return user;
 }

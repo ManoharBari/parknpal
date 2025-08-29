@@ -158,7 +158,7 @@ export default function ParkingMap({ onSpotSelect }: ParkingMapProps) {
             )}
           </div>
 
-          {(showFilters || window.innerWidth >= 1024) && (
+          {(showFilters) && (
             <div className="flex flex-wrap gap-2 lg:grid lg:grid-cols-2 lg:gap-2">
               {filters.map((filter) => (
                 <Button

@@ -2,14 +2,16 @@
 
 import { Button } from "@/components/ui/button"
 import { useRouter, usePathname } from "next/navigation"
+import { useEffect } from "react"
 
 interface DesktopSidebarProps {
+  user: string
   activeTab: string
   onTabChange: (tab: string) => void
   userRole: "user" | "owner"
 }
 
-export default function DesktopSidebar({ activeTab, onTabChange, userRole }: DesktopSidebarProps) {
+export default function DesktopSidebar({ user, activeTab, onTabChange, userRole }: DesktopSidebarProps) {
   const router = useRouter()
   const pathname = usePathname()
 
@@ -150,8 +152,8 @@ export default function DesktopSidebar({ activeTab, onTabChange, userRole }: Des
             <span className="text-primary font-semibold">JD</span>
           </div>
           <div>
-            <p className="font-semibold font-open-sans text-sm">John Doe</p>
-            <p className="text-xs text-muted-foreground font-open-sans">john@example.com</p>
+            <p className="font-semibold font-open-sans text-sm">{user.name}</p>
+            <p className="text-xs text-muted-foreground font-open-sans">{user.email}</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={handleLogout} className="w-full text-xs bg-transparent">

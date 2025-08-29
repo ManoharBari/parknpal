@@ -10,11 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link"
 import axios from "axios"
 import toast from "react-hot-toast"
+import { useRouter } from "next/navigation"
 
 export default function LoginForm() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -27,6 +29,8 @@ export default function LoginForm() {
             if (response.status === 201) {
                 toast.success(`Welcome back, ${response.data.data.user.name}!`);
             }
+            sessionStorage.setItem("token", response.data.data.token);
+            router.push("/dashboard");
         } catch (error: any) {
             if (axios.isAxiosError(error)) {
                 const errorMessage =
