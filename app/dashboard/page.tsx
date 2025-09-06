@@ -68,12 +68,14 @@ export default function DashboardPage() {
         return;
       }
       try {
-        const { data } = await axios.get("/api/getuser", {
+        const { data } = await axios.get("/api/auth/getuser", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setuser(data.data.user);
+        setuser(data.data);
+        console.log(data.data);
+
       } catch (error: any) {
         console.log(error.response?.data || error.message);
       }

@@ -149,11 +149,17 @@ export default function DesktopSidebar({ user, activeTab, onTabChange, userRole 
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <span className="text-primary font-semibold">JD</span>
+            <span className="text-primary font-semibold"> {user?.name
+              ? user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .toUpperCase()
+              : ""}</span>
           </div>
           <div>
-            <p className="font-semibold font-open-sans text-sm">{user.name}</p>
-            <p className="text-xs text-muted-foreground font-open-sans">{user.email}</p>
+            <p className="font-semibold font-open-sans text-sm">{user.name || ""}</p>
+            <p className="text-xs text-muted-foreground font-open-sans">{user.email || ""}</p>
           </div>
         </div>
         <Button variant="outline" size="sm" onClick={handleLogout} className="w-full text-xs bg-transparent">

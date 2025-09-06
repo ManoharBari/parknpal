@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     if (!user) {
       throw new Error("User not found");
     }
-
+    console.log(user);
     return successResponse(user, 200);
   } catch (error) {
     return errorResponse("Unauthorized", 401);
